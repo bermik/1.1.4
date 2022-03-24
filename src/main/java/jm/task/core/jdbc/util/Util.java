@@ -1,21 +1,23 @@
 package jm.task.core.jdbc.util;
 
 import java.sql.*;
+import java.util.Properties;
 
 public class Util {
     // реализуйте настройку соеденения с БД
-    private final String URL = "jdbc:mysql://localhost:3306/mdbtest";
-    private final String USER = "root";
-    private final String PASSWORD = "root";
-    private final Connection connection;
+    private static final String URL = "jdbc:mysql://localhost:3306/mdbtest";
+    private static final String USER = "root";
+    private static final String PASSWORD = "root";
+    private static Connection connection;
 
-    public Util() throws SQLException{
-        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+    public Util() {
     }
-    public Connection getConnection() {
+
+    public static Connection getConnection() throws SQLException{
+        if (connection == null) {
+            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+            connection.setAutoCommit(false);
+        }
         return connection;
-    }
-    public Statement getStatement() throws SQLException{
-        return connection.createStatement();
     }
 }

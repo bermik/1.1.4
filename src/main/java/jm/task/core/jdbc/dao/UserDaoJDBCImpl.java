@@ -15,27 +15,20 @@ public class UserDaoJDBCImpl implements UserDao {
     private static final String SAVE_USER = "INSERT INTO UsersTable(name, lastName, age) VALUES(?,?,?)";
     private static final String DELETE_USER = "DELETE FROM UsersTable WHERE id = (?)";
     private static final String GET_ALL_USERS = "SELECT * FROM UsersTable";
-    private Util util;
-    {
-        try {
-            util = new Util();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
-        try (Statement statement = util.getConnection().createStatement()){
+        try (Statement statement = Util.getConnection().createStatement()){
             //if table doesn't exist then create
-            if (!util.getConnection()
+            if (!Util.getConnection()
                     .getMetaData()
                     .getTables(null, null, "UsersTable", new String[] {"TABLE"})
                     .next()) {
                 statement.executeUpdate("CREATE TABLE UsersTable (id BIGINT primary key auto_increment, name VARCHAR(40), lastName VARCHAR(40), age TINYINT)");
+                Util.getConnection().commit();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -43,13 +36,14 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
-        try (Statement statement = util.getConnection().createStatement()){
+        try (Statement statement = Util.getConnection().createStatement()){
             //if table exists then drop
-            if (util.getConnection()
+            if (Util.getConnection()
                     .getMetaData()
                     .getTables(null, null, "UsersTable", new String[] {"TABLE"})
                     .next()) {
                 statement.executeUpdate("DROP TABLE UsersTable");
+                Util.getConnection().commit();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -57,20 +51,22 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        try (PreparedStatement preparedStatement = util.getConnection().prepareStatement(SAVE_USER)){
+        try (PreparedStatement preparedStatement = Util.getConnection().prepareStatement(SAVE_USER)){
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
+            Util.getConnection().commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void removeUserById(long id) {
-        try (PreparedStatement preparedStatement = util.getConnection().prepareStatement(DELETE_USER)){
+        try (PreparedStatement preparedStatement = Util.getConnection().prepareStatement(DELETE_USER)){
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
+            Util.getConnection().commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -78,7 +74,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
-        try (ResultSet resultSet = util.getConnection().prepareStatement(GET_ALL_USERS).executeQuery()){
+        try (ResultSet resultSet = Util.getConnection().prepareStatement(GET_ALL_USERS).executeQuery()){
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong(1));
@@ -94,8 +90,9 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try (PreparedStatement preparedStatement = util.getConnection().prepareStatement("DELETE FROM UsersTable")){
+        try (PreparedStatement preparedStatement = Util.getConnection().prepareStatement("DELETE FROM UsersTable")){
             preparedStatement.executeUpdate();
+            Util.getConnection().commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
