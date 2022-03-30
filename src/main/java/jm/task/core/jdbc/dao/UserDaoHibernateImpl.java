@@ -2,6 +2,7 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -27,7 +28,10 @@ public class UserDaoHibernateImpl implements UserDao {
                     .addEntity(User.class).executeUpdate();
             transaction.commit();
             session.close();
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
@@ -41,7 +45,10 @@ public class UserDaoHibernateImpl implements UserDao {
                     .addEntity(User.class).executeUpdate();
             transaction.commit();
             session.close();
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
@@ -54,7 +61,10 @@ public class UserDaoHibernateImpl implements UserDao {
             User user = new User(name, lastName, age);
             session.save(user);
             transaction.commit();
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
@@ -66,7 +76,10 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction = session.beginTransaction();
             session.delete(session.get(User.class, id));
             transaction.commit();
-        } catch (Exception e) {
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
@@ -79,7 +92,10 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction = session.beginTransaction();
             list = session.createQuery("from User", User.class).list();
             transaction.commit();
-        } catch (Exception e) {
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
         return list;
@@ -92,7 +108,10 @@ public class UserDaoHibernateImpl implements UserDao {
             transaction = session.beginTransaction();
             session.createSQLQuery("delete from UsersTable").executeUpdate();
             transaction.commit();
-        } catch (SQLException e) {
+        } catch (HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         }
     }
