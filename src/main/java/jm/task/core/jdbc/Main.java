@@ -23,5 +23,6 @@ public class Main {
         list.forEach(System.out::println);
         userService.cleanUsersTable();
         userService.dropUsersTable();
+        Util.closeSessionFactory();
     }
 }
